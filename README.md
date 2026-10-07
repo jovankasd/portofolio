@@ -2,6 +2,8 @@
 
 > **Editorial Precision & Warm Atmosphere**  
 > A personal portfolio and tech dossier for an AI Orchestrator & Agentic AI Engineer.
+> 
+> 🔴 **Live Demo:** [Obsidian & Atmosphere](https://portofolio-a7n03uyyy-jovankasuryad58296-7922s-projects.vercel.app/)
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase)](https://supabase.com/)
