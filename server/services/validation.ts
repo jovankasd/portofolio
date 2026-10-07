@@ -171,7 +171,7 @@ export const pageUpdateSchema = z.object({
     .nullable()
     .optional(),
   metadata: z
-    .record(z.string().max(MAX_TAG_LENGTH), z.string().max(MAX_URL))
+    .record(z.string().max(MAX_TAG_LENGTH), z.any())
     .refine((m) => Object.keys(m).length <= MAX_METADATA_KEYS, "Terlalu banyak field metadata")
     .optional(),
   is_published: z.boolean().optional(),
@@ -232,10 +232,18 @@ export function validateAssetFile(
 
 /** Identify a file by its magic bytes; the client-supplied MIME type is not trusted. */
 export function detectAssetFormat(bytes: Uint8Array): AssetFormat | null {
-  const startsWith = (sig: number[], offset = 0) =>
-    sig.every((b, i) => bytes[offset + i] === b);
+  const startsWith = (sig: number[], offset = 0) => {
+    if (bytes.length < offset + sig.length) return false;
+    return sig.every((b, i) => bytes[offset + i] === b);
+  };
 
-  if (startsWith([0x25, 0x50, 0x44, 0x46, 0x2d])) return "pdf"; // %PDF-
+  // PDF magic can be anywhere in first 1024 bytes
+  const pdfSig = [0x25, 0x50, 0x44, 0x46, 0x2d];
+  const maxSearch = Math.min(bytes.length, 1024);
+  for (let i = 0; i < maxSearch - pdfSig.length + 1; i++) {
+    if (startsWith(pdfSig, i)) return "pdf";
+  }
+
   if (startsWith([0xff, 0xd8, 0xff])) return "jpg";
   if (startsWith([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return "png";
   if (startsWith([0x52, 0x49, 0x46, 0x46]) && startsWith([0x57, 0x45, 0x42, 0x50], 8)) return "webp";

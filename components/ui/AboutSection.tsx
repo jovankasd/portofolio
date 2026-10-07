@@ -22,7 +22,8 @@ export default function AboutSection({ skills = [], tools = [], principles = [],
   const displayContent = content || DOSSIER_PROFILE.bio;
 
   return (
-    <section id="tentang" className="border-y border-[#1D1B18]/10 bg-[#E9E2D6] px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+    <section id="tentang" className="flex min-h-svh flex-col justify-center border-y border-[#1D1B18]/10 bg-[#E9E2D6] px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+      <div className="w-full">
       <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
         <Reveal>
           <p className="text-sm font-medium text-[#BD4B2A]">Tentang saya</p>
@@ -72,6 +73,7 @@ export default function AboutSection({ skills = [], tools = [], principles = [],
             </Reveal>
           ))}
         </div>
+      </div>
       </div>
     </section>
   );

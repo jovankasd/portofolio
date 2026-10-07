@@ -8,9 +8,11 @@ import type { CredentialItem } from "@/shared/types";
 
 interface Props {
   credentials: CredentialItem[];
+  title?: string | null;
+  content?: string | null;
 }
 
-export default function CredentialsSectionClient({ credentials }: Props) {
+export default function CredentialsSectionClient({ credentials, title, content }: Props) {
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
 
   return (
@@ -19,8 +21,8 @@ export default function CredentialsSectionClient({ credentials }: Props) {
         <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
           <Reveal>
             <p className="text-sm font-medium text-[#D67B5A]">Rekam jejak</p>
-            <h2 className="mt-3 text-balance text-3xl font-medium leading-tight tracking-[-0.04em]">Belajar, mencoba, dan membuktikan.</h2>
-            <p className="mt-4 max-w-sm text-pretty text-sm leading-6 text-[#D7CEC0]/75">Pendidikan dan bukti belajar yang melengkapi pengalaman membangun sistem.</p>
+            <h2 className="mt-3 text-balance text-3xl font-medium leading-tight tracking-[-0.04em]">{title || "Belajar, mencoba, dan membuktikan."}</h2>
+            <p className="mt-4 max-w-sm text-pretty text-sm leading-6 text-[#D7CEC0]/75">{content || "Pendidikan dan bukti belajar yang melengkapi pengalaman membangun sistem."}</p>
           </Reveal>
           <div>
             <Reveal>

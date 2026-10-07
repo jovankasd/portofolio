@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { verifyAdminSession } from "@/server/auth/session";
-import { getProjects, getCredentials, getSiteSettings, getAllPages } from "@/server/db/queries";
+import { getProjects, getCredentials, getAllPages } from "@/server/db/queries";
 import { logoutAdmin } from "@/server/actions/auth.actions";
 import DashboardClient from "@/components/admin/DashboardClient";
 
@@ -19,10 +19,9 @@ export default async function DashboardPage() {
   const valid = await verifyAdminSession();
   if (!valid) redirect("/admin");
 
-  const [projects, credentials, siteSettings, pages] = await Promise.all([
+  const [projects, credentials, pages] = await Promise.all([
     getProjects(),
     getCredentials(),
-    getSiteSettings(),
     getAllPages(),
   ]);
 
@@ -61,7 +60,6 @@ export default async function DashboardPage() {
           initialPages={pages}
           initialProjects={projects}
           initialCredentials={credentials}
-          initialSettings={siteSettings}
         />
       </div>
     </main>

@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, Download } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Navbar from "@/components/ui/Navbar";
 import HeroSection from "@/components/ui/HeroSection";
 import AboutSection from "@/components/ui/AboutSection";
@@ -11,41 +10,45 @@ import CredentialsSectionClient from "@/components/ui/CredentialsSectionClient";
 import { DOSSIER_PROFILE } from "@/shared/constants/profile";
 import { INITIAL_CREDENTIALS, INITIAL_PROJECTS, INITIAL_SKILLS, INITIAL_TOOLS, INITIAL_PRINCIPLES } from "@/shared/constants/defaults";
 import type { ProjectItem, CredentialItem } from "@/shared/types";
-import { getProjects, getCredentials, getSiteSettings, getPageBySlug } from "@/server/db/queries";
+import { getProjects, getCredentials, getPageBySlug } from "@/server/db/queries";
 
 export const revalidate = 60; // optionally revalidate every 60s
 
 export default async function HomePage() {
-  const [dbProjects, dbCredentials, siteSettings, berandaPage, tentangPage] = await Promise.all([
+  const [dbProjects, dbCredentials, berandaPage, tentangPage, rekamJejakPage, hubungiSayaPage, footerPage] = await Promise.all([
     getProjects(),
     getCredentials(),
-    getSiteSettings(),
     getPageBySlug('beranda'),
     getPageBySlug('tentang'),
+    getPageBySlug('rekam-jejak'),
+    getPageBySlug('hubungi-saya'),
+    getPageBySlug('footer'),
   ]);
 
   const projects = dbProjects.length > 0 ? dbProjects : INITIAL_PROJECTS;
   const credentials = dbCredentials.length > 0 ? dbCredentials : INITIAL_CREDENTIALS;
   
-  const skills = siteSettings && Array.isArray(siteSettings.skills) && siteSettings.skills.length > 0 
-    ? (siteSettings.skills as string[]) 
-    : INITIAL_SKILLS;
+  const skillsStr = tentangPage?.metadata?.skills as string | undefined;
+  const skills = skillsStr ? skillsStr.split(",").map(s => s.trim()).filter(Boolean) : INITIAL_SKILLS;
     
-  const tools = siteSettings && Array.isArray(siteSettings.tools) && siteSettings.tools.length > 0 
-    ? (siteSettings.tools as string[]) 
-    : INITIAL_TOOLS;
+  const toolsStr = tentangPage?.metadata?.tools as string | undefined;
+  const tools = toolsStr ? toolsStr.split(",").map(s => s.trim()).filter(Boolean) : INITIAL_TOOLS;
     
-  const principles = siteSettings && Array.isArray(siteSettings.principles) && siteSettings.principles.length > 0 
-    ? (siteSettings.principles as unknown as { number: string; title: string; description: string }[]) 
+  const principles = tentangPage?.metadata?.principles && Array.isArray(tentangPage.metadata.principles) && tentangPage.metadata.principles.length > 0 
+    ? (tentangPage.metadata.principles as unknown as { number: string; title: string; description: string }[]) 
     : INITIAL_PRINCIPLES;
 
-  const footerText = siteSettings?.footer_text || `© ${new Date().getFullYear()} · ${DOSSIER_PROFILE.location}`;
+  const footerText = (footerPage?.metadata?.footer_text as string | undefined) || `© ${new Date().getFullYear()} · ${DOSSIER_PROFILE.location}`;
+
+  const socialsData = hubungiSayaPage?.metadata?.socials && Array.isArray(hubungiSayaPage.metadata.socials) && hubungiSayaPage.metadata.socials.length > 0 
+    ? (hubungiSayaPage.metadata.socials as unknown as { label: string; url: string; address?: string }[])
+    : DOSSIER_PROFILE.socials;
 
   return (
     <main id="top" className="min-h-dvh bg-[#F4F0E8] text-[#1D1B18]">
       <Navbar />
 
-      <HeroSection metadata={berandaPage?.metadata} cvUrl={siteSettings?.cv_url || DOSSIER_PROFILE.cv_filename} />
+      <HeroSection metadata={berandaPage?.metadata} cvUrl={(berandaPage?.metadata?.cv_url as string | undefined) || DOSSIER_PROFILE.cv_filename} />
 
       <AboutSection 
         skills={skills} 
@@ -75,16 +78,23 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <CredentialsSectionClient credentials={credentials as unknown as CredentialItem[]} />
+      <CredentialsSectionClient 
+        credentials={credentials as unknown as CredentialItem[]} 
+        title={rekamJejakPage?.title}
+        content={rekamJejakPage?.content}
+      />
 
-      <DirectUplink />
+      <DirectUplink 
+        title={hubungiSayaPage?.title}
+        content={hubungiSayaPage?.content}
+        socials={socialsData}
+      />
 
       <footer className="border-t border-[#1D1B18]/10 px-5 py-7 text-sm text-[#625C54] sm:px-8 lg:px-12">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-medium text-[#1D1B18]">{DOSSIER_PROFILE.codename}</span>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <span>{footerText}</span>
-            <Link href="/admin" className="transition-colors hover:text-[#BD4B2A]">Admin</Link>
           </div>
         </div>
       </footer>

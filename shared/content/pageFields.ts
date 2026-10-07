@@ -3,7 +3,7 @@
  * form (components/admin/PageForm.tsx) and the public resolvers
  * (shared/content/resolve.ts), so a key can't be edited without being read.
  */
-export type PageFieldType = "text" | "textarea" | "photo";
+export type PageFieldType = "text" | "textarea" | "photo" | "file" | "comma-separated" | "principles" | "socials";
 
 export interface PageField {
   key: string;
@@ -21,9 +21,27 @@ export const HERO_FIELDS: readonly PageField[] = [
   { key: "hero_cta_text", label: "Teks tombol karya", type: "text" },
   { key: "hero_cv_button_text", label: "Teks tombol unduh CV", type: "text" },
   { key: "profile_photo_url", label: "Foto profil", type: "photo" },
+  { key: "cv_url", label: "File CV (PDF)", type: "file" },
+];
+
+export const TENTANG_FIELDS: readonly PageField[] = [
+  { key: "skills", label: "Keahlian (Pisahkan dengan koma)", type: "comma-separated" },
+  { key: "tools", label: "Peralatan (Pisahkan dengan koma)", type: "comma-separated" },
+  { key: "principles", label: "Prinsip", type: "principles" },
+];
+
+export const HUBUNGI_SAYA_FIELDS: readonly PageField[] = [
+  { key: "socials", label: "Media Sosial", type: "socials" },
+];
+
+export const FOOTER_FIELDS: readonly PageField[] = [
+  { key: "footer_text", label: "Teks Footer", type: "text" },
 ];
 
 /** Pages that store their fields in `metadata`. Any other slug edits title + content. */
 export const PAGE_FIELDS: Record<string, readonly PageField[]> = {
   beranda: HERO_FIELDS,
+  tentang: TENTANG_FIELDS,
+  "hubungi-saya": HUBUNGI_SAYA_FIELDS,
+  footer: FOOTER_FIELDS,
 };

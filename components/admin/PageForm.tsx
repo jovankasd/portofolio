@@ -6,7 +6,8 @@ import AssetUploadField from "./AssetUploadField";
 
 interface Props {
   page: PageRow;
-  onSubmit: (slug: string, payload: { title: string; content: string | null; metadata: Record<string, string> }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSubmit: (slug: string, payload: { title: string; content: string | null; metadata: Record<string, any>; is_published: boolean }) => void;
   onCancel: () => void;
   isPending: boolean;
 }
@@ -17,9 +18,19 @@ export default function PageForm({ page, onSubmit, onCancel, isPending }: Props)
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const newMetadata: Record<string, string> = { ...page.metadata };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newMetadata: Record<string, any> = { ...page.metadata };
     fields.forEach((f) => {
-      newMetadata[f.key] = (fd.get(f.key) as string) || "";
+      const val = (fd.get(f.key) as string) || "";
+      if (f.type === "principles" || f.type === "socials") {
+        try {
+          newMetadata[f.key] = JSON.parse(val);
+        } catch {
+          newMetadata[f.key] = [];
+        }
+      } else {
+        newMetadata[f.key] = val;
+      }
     });
     const newTitle = fd.get("title") as string;
     const newContent = fd.get("content") as string;
@@ -81,19 +92,42 @@ export default function PageForm({ page, onSubmit, onCancel, isPending }: Props)
                 </div>
               );
             }
-            if (f.type === "textarea") {
+            if (f.type === "file") {
+              return (
+                <div key={f.key}>
+                  <AssetUploadField
+                    label={f.label}
+                    uploadLabel={`Unggah ${f.label}`}
+                    name={f.key}
+                    kind="cv"
+                    accept="application/pdf"
+                    defaultValue={page.metadata?.[f.key]}
+                    hint="Format PDF (Max 10MB)"
+                  />
+                </div>
+              );
+            }
+            if (f.type === "textarea" || f.type === "comma-separated") {
               return (
                 <div key={f.key}>
                   <label htmlFor={f.key} className="block text-xs font-mono text-[#1d1b18]/65 mb-1.5">{f.label}</label>
                   <textarea
                     id={f.key}
                     name={f.key}
-                    defaultValue={page.metadata?.[f.key] || ""}
-                    rows={3}
+                    defaultValue={typeof page.metadata?.[f.key] === "string" ? page.metadata?.[f.key] : JSON.stringify(page.metadata?.[f.key] || "")}
+                    rows={f.type === "comma-separated" ? 2 : 3}
                     className="w-full px-3 py-2 text-sm rounded border border-[#1d1b18]/20 focus:outline-none focus:border-[#bd4b2a]"
                   />
                 </div>
               );
+            }
+            if (f.type === "principles") {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              return <DynamicPrinciplesField key={f.key} defaultValue={page.metadata?.[f.key] as any} name={f.key} />;
+            }
+            if (f.type === "socials") {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              return <DynamicSocialsField key={f.key} defaultValue={page.metadata?.[f.key] as any} name={f.key} />;
             }
             return (
               <div key={f.key}>
@@ -101,7 +135,7 @@ export default function PageForm({ page, onSubmit, onCancel, isPending }: Props)
                 <input
                   id={f.key}
                   name={f.key}
-                  defaultValue={page.metadata?.[f.key] || ""}
+                  defaultValue={typeof page.metadata?.[f.key] === "string" ? page.metadata?.[f.key] : ""}
                   className="w-full px-3 py-2 text-sm rounded border border-[#1d1b18]/20 focus:outline-none focus:border-[#bd4b2a]"
                 />
               </div>
@@ -127,5 +161,136 @@ export default function PageForm({ page, onSubmit, onCancel, isPending }: Props)
         </button>
       </div>
     </form>
+  );
+}
+
+import { useState } from "react";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DynamicPrinciplesField({ defaultValue, name }: { defaultValue: any; name: string }) {
+  const [items, setItems] = useState<{ number: string; title: string; description: string }[]>(
+    Array.isArray(defaultValue) ? defaultValue : []
+  );
+
+  return (
+    <div className="space-y-3">
+      <label className="block text-xs font-mono text-[#1d1b18]/65">Prinsip Kerja</label>
+      <input type="hidden" name={name} value={JSON.stringify(items)} />
+      {items.map((item, i) => (
+        <div key={i} className="p-3 border border-[#1d1b18]/10 rounded space-y-2 bg-gray-50/50">
+          <div className="flex gap-2">
+            <input
+              placeholder="01"
+              value={item.number}
+              onChange={(e) => {
+                const newItems = [...items];
+                newItems[i].number = e.target.value;
+                setItems(newItems);
+              }}
+              className="w-16 px-2 py-1 text-sm rounded border border-[#1d1b18]/20"
+            />
+            <input
+              placeholder="Judul Prinsip"
+              value={item.title}
+              onChange={(e) => {
+                const newItems = [...items];
+                newItems[i].title = e.target.value;
+                setItems(newItems);
+              }}
+              className="flex-1 px-2 py-1 text-sm rounded border border-[#1d1b18]/20"
+            />
+            <button
+              type="button"
+              onClick={() => setItems(items.filter((_, idx) => idx !== i))}
+              className="px-2 text-xs text-red-500 hover:bg-red-50 rounded"
+            >
+              Hapus
+            </button>
+          </div>
+          <textarea
+            placeholder="Deskripsi..."
+            value={item.description}
+            onChange={(e) => {
+              const newItems = [...items];
+              newItems[i].description = e.target.value;
+              setItems(newItems);
+            }}
+            rows={2}
+            className="w-full px-2 py-1 text-sm rounded border border-[#1d1b18]/20"
+          />
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => setItems([...items, { number: "", title: "", description: "" }])}
+        className="text-xs font-mono text-[#bd4b2a] hover:underline"
+      >
+        + Tambah Prinsip
+      </button>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DynamicSocialsField({ defaultValue, name }: { defaultValue: any; name: string }) {
+  const [items, setItems] = useState<{ label: string; url: string; address?: string }[]>(
+    Array.isArray(defaultValue) ? defaultValue : []
+  );
+
+  return (
+    <div className="space-y-3">
+      <label className="block text-xs font-mono text-[#1d1b18]/65">Media Sosial</label>
+      <input type="hidden" name={name} value={JSON.stringify(items)} />
+      {items.map((item, i) => (
+        <div key={i} className="flex gap-2 items-start">
+          <div className="flex-1 space-y-2">
+            <input
+              placeholder="Label (misal: LinkedIn)"
+              value={item.label}
+              onChange={(e) => {
+                const newItems = [...items];
+                newItems[i].label = e.target.value;
+                setItems(newItems);
+              }}
+              className="w-full px-2 py-1 text-sm rounded border border-[#1d1b18]/20"
+            />
+            <input
+              placeholder="URL atau Username"
+              value={item.url}
+              onChange={(e) => {
+                const newItems = [...items];
+                newItems[i].url = e.target.value;
+                setItems(newItems);
+              }}
+              className="w-full px-2 py-1 text-sm rounded border border-[#1d1b18]/20"
+            />
+            <input
+              placeholder="(Opsional) Alamat Email/dll"
+              value={item.address || ""}
+              onChange={(e) => {
+                const newItems = [...items];
+                newItems[i].address = e.target.value;
+                setItems(newItems);
+              }}
+              className="w-full px-2 py-1 text-sm rounded border border-[#1d1b18]/20"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setItems(items.filter((_, idx) => idx !== i))}
+            className="px-2 py-1 text-xs text-red-500 hover:bg-red-50 rounded mt-1"
+          >
+            Hapus
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => setItems([...items, { label: "", url: "" }])}
+        className="text-xs font-mono text-[#bd4b2a] hover:underline"
+      >
+        + Tambah Sosial Media
+      </button>
+    </div>
   );
 }

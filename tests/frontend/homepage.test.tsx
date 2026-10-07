@@ -1,13 +1,11 @@
-/** @vitest-environment jsdom */
-import { test, expect } from 'vitest';
+// @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
+import { test, expect } from 'vitest';
 import HeroSection from '@/components/ui/HeroSection';
 
-test('HeroSection menggunakan fallback jika metadata kosong', () => {
-    render(<HeroSection metadata={null} cvUrl="test.pdf" />);
-    // "Jovanka" is the fallback name in my plan ?
-    // Wait, let's see the fallback values.
-    // The spec says `page?.metadata?.hero_name || "Nama Bawaan"`.
-    // Wait, the plan says "Nama Bawaan". Wait, the actual site says "Jovanka Surya Dilla".
-    expect(screen.getByText('Jovanka')).toBeDefined();
+test('HeroSection gracefully falls back if page metadata is completely empty/null', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render(<HeroSection metadata={null as any} cvUrl={null as any} />);
+  expect(screen.getByText(/Jovanka/i)).toBeDefined();
+  expect(screen.getByText(/Surya Dilla/i)).toBeDefined();
 });

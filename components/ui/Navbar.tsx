@@ -18,6 +18,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("beranda");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     let frame = 0;
@@ -60,8 +61,15 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-[#1D1B18]/[0.07] bg-[#F4F0E8]/90 backdrop-blur-md">
+    <header className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${isScrolled ? "border-b border-[#1D1B18]/[0.07] bg-[#F4F0E8]/90 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
       <div className="scroll-progress absolute inset-x-0 top-0 h-0.5 bg-[#BD4B2A]" style={{ "--scroll-progress": progress } as CSSProperties} />
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link href="#beranda" className="text-sm font-semibold tracking-[-0.02em] text-[#1D1B18]">

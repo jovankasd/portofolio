@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   async headers() {
     return [
       {
@@ -26,6 +31,20 @@ const nextConfig = {
             value: "camera=(), microphone=(), geolocation=()",
           }
         ],
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: "/dossier-control",
+        destination: "/admin",
+        permanent: true,
+      },
+      {
+        source: "/dossier-control/:path*",
+        destination: "/admin/:path*",
+        permanent: true,
       },
     ];
   },

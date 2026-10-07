@@ -5,7 +5,15 @@ import { ArrowUpRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { DOSSIER_PROFILE } from "@/shared/constants/profile";
 import Reveal from "@/components/ui/Reveal";
 
-export default function DirectUplink() {
+export default function DirectUplink({ 
+  title, 
+  content,
+  socials = DOSSIER_PROFILE.socials
+}: { 
+  title?: string | null; 
+  content?: string | null;
+  socials?: { label: string; url: string; address?: string }[];
+}) {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,25 +44,25 @@ export default function DirectUplink() {
     }
   };
 
-  const email = DOSSIER_PROFILE.socials.find((social) => social.label === "EMAIL");
-  const socials = DOSSIER_PROFILE.socials.filter((social) => social.label !== "EMAIL");
+  const email = socials.find((social) => social.label === "EMAIL");
+  const otherSocials = socials.filter((social) => social.label !== "EMAIL");
 
   return (
     <section id="kontak" className="flex min-h-svh items-center bg-[#E9E2D6] px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
       <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
         <Reveal>
           <p className="text-sm font-medium text-[#BD4B2A]">Kontak</p>
-          <h2 className="mt-3 max-w-lg text-3xl font-medium leading-tight tracking-[-0.04em] sm:text-4xl">Mari bicarakan ide atau proyek Anda.</h2>
-          <p className="mt-4 max-w-md text-sm leading-6 text-[#625C54]">Terbuka untuk percakapan tentang AI, rekayasa perangkat lunak, dan produk digital.</p>
+          <h2 className="mt-3 max-w-lg text-3xl font-medium leading-tight tracking-[-0.04em] sm:text-4xl">{title || "Mari bicarakan ide atau proyek Anda."}</h2>
+          <p className="mt-4 max-w-md text-sm leading-6 text-[#625C54]">{content || "Terbuka untuk percakapan tentang AI, rekayasa perangkat lunak, dan produk digital."}</p>
           {email && (
             <a href={email.url} className="mt-7 inline-flex min-h-11 items-center gap-2 text-base font-medium text-[#4D463D] hover:text-[#BD4B2A]">
               {email.address} <ArrowUpRight size={16} aria-hidden="true" />
             </a>
           )}
           <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
-            {socials.map((social) => (
+            {otherSocials.map((social) => (
               <a key={social.label} href={social.url} target="_blank" rel="noreferrer" className="min-h-10 inline-flex items-center text-sm text-[#625C54] hover:text-[#1D1B18]">
-                {social.label === "GITHUB" ? "GitHub" : social.label === "LINKEDIN" ? "LinkedIn" : social.label}
+                {social.label}
               </a>
             ))}
           </div>

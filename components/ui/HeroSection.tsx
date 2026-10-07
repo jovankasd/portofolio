@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { ArrowDown, Download } from "lucide-react";
-import { DOSSIER_PROFILE } from "@/shared/constants/profile";
 
-export default function HeroSection({ metadata, cvUrl }: { metadata?: any, cvUrl: string }) {
+
+export default function HeroSection({ metadata, cvUrl }: { metadata?: Record<string, string>, cvUrl: string }) {
   const name = metadata?.hero_name || "Jovanka Surya Dilla";
   const eyebrow = metadata?.hero_eyebrow || "Personal portfolio · AI systems";
   const rolePrimary = metadata?.hero_role_primary || "AI Orchestrator";
@@ -16,7 +16,7 @@ export default function HeroSection({ metadata, cvUrl }: { metadata?: any, cvUrl
   const [firstName, ...restName] = name.split(" ");
   const lastName = restName.join(" ");
   
-  const finalCvUrl = cvUrl.startsWith("http") ? cvUrl : `/${cvUrl}`;
+  const finalCvUrl = (cvUrl || "").startsWith("http") ? cvUrl : `/${cvUrl || ""}`;
 
   return (
     <section id="beranda" className="home-hero relative flex min-h-svh items-center overflow-hidden px-5 pb-14 pt-28 sm:px-8 sm:pb-16 sm:pt-32 lg:px-12">

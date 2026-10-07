@@ -76,6 +76,13 @@ create table if not exists public.site_settings (
   constraint site_settings_single_row check (id = 1)
 );
 
+-- Pastikan kolom baru ditambahkan jika tabel sudah pernah dibuat tanpa kolom tersebut
+alter table public.site_settings add column if not exists cv_url text;
+alter table public.site_settings add column if not exists social_links jsonb not null default '[]'::jsonb;
+alter table public.site_settings add column if not exists skills jsonb not null default '[]'::jsonb;
+alter table public.site_settings add column if not exists tools jsonb not null default '[]'::jsonb;
+alter table public.site_settings add column if not exists principles jsonb not null default '[]'::jsonb;
+
 -- Seed baris tunggal site_settings
 insert into public.site_settings (id, hero_tagline, cv_url, social_links, skills, tools, principles)
 values (

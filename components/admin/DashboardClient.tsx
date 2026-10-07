@@ -12,29 +12,25 @@ import {
   updateCredential,
   deleteCredential,
 } from "@/server/actions/credential.actions";
-import { updateSiteSettings } from "@/server/actions/site_settings.actions";
 import { updatePageAction } from "@/server/actions/pages.actions";
-import type { ProjectRow, CredentialRow, SiteSettingsRow, PageRow } from "@/server/db/types";
+import type { ProjectRow, CredentialRow, PageRow } from "@/server/db/types";
 import ProjectForm from "./ProjectForm";
 import CredentialForm from "./CredentialForm";
-import SiteSettingsForm from "./SiteSettingsForm";
 import PageForm from "./PageForm";
 
 interface Props {
   initialPages: PageRow[];
   initialProjects: ProjectRow[];
   initialCredentials: CredentialRow[];
-  initialSettings: SiteSettingsRow | null;
 }
 
-type Tab = "pages" | "projects" | "credentials" | "settings";
+type Tab = "pages" | "projects" | "credentials";
 
-export default function DashboardClient({ initialPages, initialProjects, initialCredentials, initialSettings }: Props) {
+export default function DashboardClient({ initialPages, initialProjects, initialCredentials }: Props) {
   const [tab, setTab] = useState<Tab>("pages");
   const [pages, setPages] = useState(initialPages);
   const [projects, setProjects] = useState(initialProjects);
   const [credentials, setCredentials] = useState(initialCredentials);
-  const [settings, setSettings] = useState(initialSettings);
   const [editingPage, setEditingPage] = useState<PageRow | null>(null);
   const [editingProject, setEditingProject] = useState<ProjectRow | null>(null);
   const [editingCred, setEditingCred] = useState<CredentialRow | null>(null);
@@ -50,7 +46,8 @@ export default function DashboardClient({ initialPages, initialProjects, initial
 
   // ── Pages ──────────────────────────────────────────────────
 
-  async function handleSavePage(slug: string, payload: { title: string; content: string | null; metadata: Record<string, string>; is_published: boolean }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function handleSavePage(slug: string, payload: { title: string; content: string | null; metadata: Record<string, any>; is_published: boolean }) {
     startTransition(async () => {
       const { data, error } = await updatePageAction(slug, payload);
       if (error) { notify("err", error); return; }
@@ -144,33 +141,6 @@ export default function DashboardClient({ initialPages, initialProjects, initial
     });
   }
 
-  // ── Settings ─────────────────────────────────────────────
-
-  async function handleSaveSettings(formData: FormData) {
-    let parsedPrinciples;
-    try {
-      parsedPrinciples = JSON.parse(formData.get("principles") as string);
-    } catch {
-      notify("err", "Format JSON principles tidak valid.");
-      return;
-    }
-
-    const payload = {
-      hero_tagline: (formData.get("hero_tagline") as string) || null,
-      footer_text: (formData.get("footer_text") as string) || null,
-      cv_url: (formData.get("cv_url") as string) || null,
-      skills: ((formData.get("skills") as string) || "").split(",").map((s) => s.trim()).filter(Boolean),
-      tools: ((formData.get("tools") as string) || "").split(",").map((s) => s.trim()).filter(Boolean),
-      principles: parsedPrinciples,
-    };
-
-    startTransition(async () => {
-      const { data, error } = await updateSiteSettings(payload);
-      if (error) { notify("err", error); return; }
-      if (data) setSettings(data);
-      notify("ok", "Pengaturan situs berhasil diperbarui.");
-    });
-  }
 
   return (
     <div>
@@ -189,7 +159,7 @@ export default function DashboardClient({ initialPages, initialProjects, initial
 
       {/* Tab switcher */}
       <div className="flex gap-8 mb-8 border-b border-[#1d1b18]/15 overflow-x-auto">
-        {(["pages", "projects", "credentials", "settings"] as Tab[]).map((t) => (
+        {(["pages", "projects", "credentials"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -199,7 +169,7 @@ export default function DashboardClient({ initialPages, initialProjects, initial
                 : "text-[#1d1b18]/45 hover:text-[#1d1b18]"
             }`}
           >
-            {t === "pages" ? "Halaman Situs" : t === "projects" ? "Proyek Portofolio" : t === "credentials" ? "Kredensial & Sertifikasi" : "Pengaturan Situs"}
+            {t === "pages" ? "Halaman Situs" : t === "projects" ? "Proyek Portofolio" : "Kredensial & Sertifikasi"}
           </button>
         ))}
       </div>
@@ -379,14 +349,6 @@ export default function DashboardClient({ initialPages, initialProjects, initial
         </div>
       )}
 
-      {/* ── Settings Tab ── */}
-      {tab === "settings" && (
-        <SiteSettingsForm
-          initial={settings}
-          onSubmit={handleSaveSettings}
-          isPending={isPending}
-        />
-      )}
     </div>
   );
 }

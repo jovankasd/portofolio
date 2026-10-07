@@ -2,200 +2,235 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Mentransisi website portofolio dari konten statis menjadi CMS dinamis untuk mengatur semua halaman dan pengaturan global melalui panel admin.
+**Goal:** Mentransisikan portofolio statis menjadi dinamis penuh melalui panel admin yang memungkinkan perubahan teks, gambar (Foto Profil), dan PDF (CV) dengan Supabase dan Next.js Server Components.
 
-**Architecture:** Memperluas tabel `site_settings` untuk footer, membuat tabel `pages` dengan kolom `metadata` (JSONB) untuk tata letak halaman spesifik, dan menggunakan Supabase Storage untuk mengunggah CV (PDF) serta foto profil.
+**Architecture:** Memperluas tabel `site_settings` untuk pengaturan teks footer & CV, serta menambahkan tabel `pages` untuk mengatur metadata/konten per slug halaman. Admin panel (Client Components) menggunakan Server Actions dengan validasi ketat dan otorisasi sesi admin untuk memutasi data. Publik memanggil data via SSR di Server Components dengan graceful fallbacks.
 
-**Tech Stack:** Next.js (App Router), Supabase (PostgreSQL, Storage), TypeScript.
+**Tech Stack:** Next.js (App Router), Supabase (Database & Storage), TypeScript, React, Tailwind CSS
 
 **Spec:** `docs/superpowers/specs/2026-10-07-dynamic-cms-design.md`
 
 ## Global Constraints
 
-- Validasi file CV wajib berekstensi PDF dengan ukuran maksimal 5MB.
-- Validasi file Foto profil wajib berekstensi JPG/PNG/WebP dengan ukuran maksimal 5MB.
-- Harus terdapat nilai *fallback default* pada front-end saat data kosong/null (misal: `hero_name || "Nama Saya"`).
-- Fitur *upload* file ke *storage* dan modifikasi tabel dilindungi dengan `verifyAdminSession()`.
+- File CV divalidasi wajib berekstensi PDF dan maksimal 5MB.
+- Foto profil divalidasi dengan format JPG/PNG/WebP dan maksimal 5MB.
+- Pengecekan ukuran dan tipe dilakukan ganda (UI front-end dan saat dieksekusi server action).
+- Fitur *upload* ke storage dan modifikasi tabel wajib dilindungi `verifyAdminSession()`.
+- Semua data komponen front-end (publik) menangani kondisi *null* menggunakan *graceful fallback* (seperti `|| "Nilai Default"`).
 
 ## Review Focus
 
-- File yang diupload gagal namun form admin tetap sukses.
-  - Test: Di dalam `tests/admin/storage.actions.test.ts`, buat fungsi storage throw error, dan pastikan action `uploadAsset` mengembalikan `{ error: ... }`.
-- Halaman pengunjung *crash* saat `metadata` kosong.
-  - Test: Di `tests/frontend/page.test.tsx`, render halaman Beranda dengan mock `getPageBySlug` me-return `metadata: null`. Pastikan render tidak melempar error dan menampilkan fallback.
-- Server Action dipanggil tanpa sesi admin.
-  - Test: Di `tests/admin/pages.actions.test.ts`, panggil `updatePageAction` tanpa mock session. Pastikan throw `Unauthorized`.
-- Ekstensi file `.exe` yang disamarkan menjadi `.pdf`.
-  - Test: Di `tests/admin/storage.actions.test.ts`, upload file dengan mime type `application/x-msdownload`, pastikan ditolak.
-- Data Supabase dibaca oleh publik saat `is_published = false`.
-  - Test: Coba fetch langsung ke Supabase API tanpa key admin untuk row yang disembunyikan.
+- **File CV melebihi 5MB atau format selain PDF:** Expectation: Di frontend ditolak, jika lolos, di Server Action gagal dilempar pesan error, UI menolak menyimpan.
+  - Test: Di Task 2 (`tests/backend/actions.test.ts`), `validateFile` test case reject invalid files.
+- **Data admin dikosongkan secara tak sengaja:** Expectation: Website publik tidak *crash*, UI *fallback* statis langsung tampil.
+  - Test: Di Task 4 (`tests/frontend/homepage.test.tsx`), pass `null` ke `HeroSection` test.
+- **Tindakan Admin oleh non-Admin (Anonim):** Expectation: Endpoints di server actions menolak query, table page tidak berubah.
+  - Test: Di Task 2 (`tests/backend/actions.test.ts`), invoke server action updatePage tanpa auth session admin.
+- **Duplikasi file sampah akibat upload ganda:** Expectation: Path upload akan menimpa (overwrite) atau menghapus file lama di Supabase storage.
+  - Test: Di Task 2, pengecekan opsi `upsert: true` di Storage Action.
 
 ---
 
-### Task 1: Pembaruan Skema Database & Storage
+### Task 1: Supabase Database Schema Migration
 
 **Files:**
 - Modify: `supabase/schema.sql`
-- Create: `tests/db/schema.test.ts` (Opsional untuk integrasi)
+- Modify: `server/db/types.ts`
+- Test: `tests/backend/db.test.ts`
 
 **Interfaces:**
-- Consumes: Koneksi ke Supabase lokal/produksi.
-- Produces: Tabel `pages`, penambahan kolom `footer_text` di `site_settings`.
+- Consumes: Konfigurasi eksisting Supabase.
+- Produces: Definisi tabel `pages`, penambahan kolom `footer_text` ke `site_settings`, dan `PageRow` interface di Typescript.
 
 - [ ] **Step 1: Write the failing test**
+
 ```typescript
-// tests/db/schema.test.ts
+import { test, expect } from 'vitest';
 import { supabase } from '@/server/db/client';
 
-test('tabel pages ada dan site_settings memiliki footer_text', async () => {
-    const { error: pagesErr } = await supabase.from('pages').select('id').limit(1);
-    const { error: settingsErr } = await supabase.from('site_settings').select('footer_text').limit(1);
-    
-    expect(pagesErr?.message).not.toContain('does not exist');
-    expect(settingsErr?.message).not.toContain('does not exist');
+test('Database has pages table and footer_text in site_settings', async () => {
+  const { error: pageErr } = await supabase.from('pages').select('id').limit(1);
+  expect(pageErr).toBeNull();
+  
+  const { error: siteErr } = await supabase.from('site_settings').select('footer_text').limit(1);
+  expect(siteErr).toBeNull();
 });
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
-Run: `npx vitest run tests/db/schema.test.ts`
-Expected: FAIL dengan pesan "relation public.pages does not exist".
 
-- [ ] **Step 3: Implement SQL Schema di `supabase/schema.sql`**
-Tambahkan `create table if not exists public.pages (id uuid primary key default gen_random_uuid(), slug text unique not null, title text not null, content text, metadata jsonb default '{}'::jsonb, is_published boolean default true, created_at timestamptz default now(), updated_at timestamptz default now());`. Aktifkan RLS dan buat policy baca publik untuk `is_published = true`. Tambahkan `alter table public.site_settings add column if not exists footer_text text;`. Lalu jalankan migrasi/script ini ke Supabase.
+Run: `npx vitest tests/backend/db.test.ts`
+Expected: FAIL with missing relations atau missing columns.
+
+- [ ] **Step 3: Implement Schema & TypeScript Types**
+
+Modify `supabase/schema.sql`: 
+Pastikan block SQL untuk membuat tabel `pages` lengkap dengan `slug`, `title`, `content`, `metadata` (jsonb), dan `is_published` diinisialisasi beserta RLS read untuk publik.
+Tambahkan `ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS footer_text text;`.
+Pastikan bucket `portfolio-assets` dibuat.
+
+Modify `server/db/types.ts`:
+Tambahkan `export interface PageRow { ... }` dan perbarui properti `SiteSettingsRow` menambahkan `footer_text?: string`.
 
 - [ ] **Step 4: Run test to verify it passes**
-Run: `npx vitest run tests/db/schema.test.ts`
+
+Run: `npx vitest tests/backend/db.test.ts` (setelah sinkronisasi skema ke Supabase dev).
 Expected: PASS
 
 - [ ] **Step 5: Commit**
+
 ```bash
-git add supabase/schema.sql tests/db/schema.test.ts
-git commit -m "feat: setup pages table and expand site_settings schema"
+git add supabase/schema.sql server/db/types.ts tests/backend/db.test.ts
+git commit -m "feat(db): add pages table and site_settings footer_text"
 ```
 
-### Task 2: Server Actions & Queries (Pages & Storage)
+### Task 2: Server Actions & Validation (Storage & Database)
 
 **Files:**
-- Modify: `server/db/types.ts`
-- Modify: `server/db/queries.ts`
-- Create: `server/actions/pages.actions.ts`
-- Create: `server/actions/storage.actions.ts`
-- Create: `tests/server/actions.test.ts`
+- Modify: `server/services/validation.ts`
+- Modify: `server/actions/storage.actions.ts`
+- Modify: `server/actions/pages.actions.ts`
+- Modify: `server/actions/site_settings.actions.ts`
+- Test: `tests/backend/actions.test.ts`
 
 **Interfaces:**
-- Consumes: `verifyAdminSession()` dari `server/auth/session.ts`, tabel `pages` dari Task 1.
-- Produces: `getPageBySlug(slug: string)`, `updatePageAction(slug: string, data: any)`, `uploadAsset(file: File, folder: string) -> string`
+- Consumes: Konfigurasi schema database dan session auth admin.
+- Produces: API (Server Actions) mutasi seperti `updatePage(slug, data)`, `updateSiteSettings(data)`, dan validasi input `validateFile(file, type)`.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing tests**
+
 ```typescript
-// tests/server/actions.test.ts
-import { getPageBySlug } from '@/server/db/queries';
+import { test, expect } from 'vitest';
+import { validateFile } from '@/server/services/validation';
+import { updatePage } from '@/server/actions/pages.actions';
 
-test('getPageBySlug mengembalikan data null untuk slug tidak valid', async () => {
-    const data = await getPageBySlug('invalid-slug');
-    expect(data).toBeNull();
+test('validateFile rejects invalid size', () => {
+  const largeFile = new File([new ArrayBuffer(6 * 1024 * 1024)], "cv.pdf", { type: "application/pdf" });
+  expect(() => validateFile(largeFile, 'document')).toThrow();
+});
+
+test('updatePage blocks unauthorized access', async () => {
+  await expect(updatePage('beranda', { title: "Test", metadata: {}, is_published: true, content: null })).rejects.toThrow();
 });
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
-Run: `npx vitest run tests/server/actions.test.ts`
-Expected: FAIL (getPageBySlug is not defined).
 
-- [ ] **Step 3: Implement `getPageBySlug`, `updatePageAction`, dan `uploadAsset`**
-Di `types.ts`, tambahkan interface `Page`. 
-Di `queries.ts`, implementasikan `getPageBySlug` menggunakan `supabase.from('pages').select('*').eq('slug', slug).single()`.
-Di `pages.actions.ts`, periksa `verifyAdminSession()`, lalu jalankan update.
-Di `storage.actions.ts`, periksa sesi, validasi ekstensi PDF/Gambar dan batas 5MB, lalu jalankan `supabase.storage.from('portfolio-assets').upload(...)` dengan opsi `upsert: true`.
+Run: `npx vitest tests/backend/actions.test.ts`
+Expected: FAIL 
+
+- [ ] **Step 3: Implement Server Actions and Validation**
+
+Modify `server/services/validation.ts`: Implementasi fungsi untuk memvalidasi ekstensi (PDF/JPG/PNG/WEBP) dan cek max 5MB size limit.
+Modify `server/actions/storage.actions.ts`: Fungsi upload file (asset CV dan foto) dengan opsional update/upsert agar menimpa file lama. Gunakan `verifyAdminSession()`. Panggil validasi file.
+Modify `server/actions/pages.actions.ts` dan `site_settings.actions.ts`: Terapkan proteksi `verifyAdminSession()` di setiap fungsi update, lalu lakukan update Supabase row terkait.
 
 - [ ] **Step 4: Run test to verify it passes**
-Run: `npx vitest run tests/server/actions.test.ts`
+
+Run: `npx vitest tests/backend/actions.test.ts`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
+
 ```bash
-git add server/db/types.ts server/db/queries.ts server/actions/pages.actions.ts server/actions/storage.actions.ts tests/server/actions.test.ts
-git commit -m "feat: implement database queries and protected server actions for pages and storage"
+git add server/services/validation.ts server/actions/ tests/backend/actions.test.ts
+git commit -m "feat(backend): implement admin-secured storage and db update actions"
 ```
 
-### Task 3: Antarmuka Admin (DashboardClient)
+### Task 3: Admin UI - Edit Forms
 
 **Files:**
-- Modify: `components/admin/DashboardClient.tsx`
-- Create: `components/admin/PageForm.tsx`
+- Modify: `components/admin/SiteSettingsForm.tsx`
+- Modify: `components/admin/PageForm.tsx`
+- Test: `tests/frontend/admin.test.tsx`
 
 **Interfaces:**
-- Consumes: `updatePageAction` dan `uploadAsset` (dari Task 2).
-- Produces: UI interaktif dengan tab "Halaman Situs" untuk mengedit metadata Beranda dan isi konten Tentang, serta komponen unggah CV di tab "Pengaturan Situs".
+- Consumes: Server Actions `updatePage`, `updateSiteSettings`, dan state internal form dari komponen admin induk.
+- Produces: Antarmuka UI yang bisa digunakan admin dengan field yang lengkap, serta pesan error feedback (validasi ganda UI).
 
 - [ ] **Step 1: Write the failing test**
-```typescript
-// tests/components/DashboardClient.test.tsx
+
+```tsx
 import { render, screen } from '@testing-library/react';
-import DashboardClient from '@/components/admin/DashboardClient';
+import { test, expect, vi } from 'vitest';
+import SiteSettingsForm from '@/components/admin/SiteSettingsForm';
 
-test('terdapat tab Halaman Situs', () => {
-    render(<DashboardClient initialProjects={[]} initialCredentials={[]} initialSettings={{} as any} initialPages={[]} />);
-    expect(screen.getByText(/Halaman Situs/i)).toBeDefined();
+test('SiteSettingsForm includes footer_text text input and CV File Upload field', () => {
+  render(<SiteSettingsForm settings={{}} onSubmit={vi.fn()} isPending={false} />);
+  expect(screen.getByLabelText(/Teks Footer/i)).toBeDefined();
+  expect(screen.getByLabelText(/Unggah CV/i)).toBeDefined();
 });
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
-Run: `npx vitest run tests/components/DashboardClient.test.tsx`
-Expected: FAIL (tidak menemukan text "Halaman Situs" atau property initialPages tidak ada).
 
-- [ ] **Step 3: Implementasi UI Form di `DashboardClient.tsx` dan `PageForm.tsx`**
-Perbarui `DashboardClient.tsx` untuk menerima prop `initialPages: Page[]`. Tambahkan tab "pages" (Halaman Situs) di samping "settings" (Pengaturan Situs). 
-Saat tab "pages" aktif, tampilkan list halaman. Jika diklik, tampilkan `PageForm.tsx`.
-Di dalam form Pengaturan Situs, tambahkan `<input type="file" />` untuk mengunggah CV menggunakan `uploadAsset`.
+Run: `npx vitest tests/frontend/admin.test.tsx`
+Expected: FAIL, missing inputs di layar.
+
+- [ ] **Step 3: Implement Frontend Admin Forms**
+
+Modify `components/admin/SiteSettingsForm.tsx`: Implementasi input `footer_text` dan integrasikan komponen file upload (`AssetUploadField` jika ada atau native `<input type="file">`) untuk handle PDF CV upload, include client-side validation <= 5MB.
+Modify `components/admin/PageForm.tsx`: Map object `metadata` JSON kedalam form field khusus slug `beranda` (seperti nama, deskripsi, foto url dengan upload handler gambar), serta text editor `content` standar.
 
 - [ ] **Step 4: Run test to verify it passes**
-Run: `npx vitest run tests/components/DashboardClient.test.tsx`
+
+Run: `npx vitest tests/frontend/admin.test.tsx`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
+
 ```bash
-git add components/admin/DashboardClient.tsx components/admin/PageForm.tsx tests/components/DashboardClient.test.tsx
-git commit -m "feat: add pages management and file upload UI to admin dashboard"
+git add components/admin/ tests/frontend/admin.test.tsx
+git commit -m "feat(admin): design settings and page editor forms with local validation"
 ```
 
-### Task 4: Integrasi Data Halaman Publik
+### Task 4: Public Views & SSR Hydration
 
 **Files:**
+- Modify: `server/db/queries.ts`
 - Modify: `app/page.tsx`
+- Modify: `components/ui/HeroSection.tsx`
 - Modify: `app/tentang/page.tsx`
-- Modify: `app/admin/dashboard/page.tsx`
+- Modify: `components/ui/Footer.tsx`
+- Test: `tests/frontend/homepage.test.tsx`
 
 **Interfaces:**
-- Consumes: `getPageBySlug` (Task 2).
-- Produces: Rendering halaman publik dinamis menggunakan fallback data.
+- Consumes: Table `pages` dan tabel `site_settings` via query.
+- Produces: Komponen final yang di-render secara dinamis di klien sesuai data admin.
 
 - [ ] **Step 1: Write the failing test**
-```typescript
-// tests/frontend/homepage.test.tsx
-import { render } from '@testing-library/react';
-import HomePage from '@/app/page';
 
-test('homepage menggunakan fallback jika metadata kosong', async () => {
-    // Render RSC is complex in vitest, mock getPageBySlug internally or check via e2e
-    const { getByText } = render(await HomePage());
-    expect(getByText('Nama Bawaan')).toBeDefined();
+```tsx
+import { render, screen } from '@testing-library/react';
+import { test, expect } from 'vitest';
+import HeroSection from '@/components/ui/HeroSection';
+
+test('HeroSection gracefully falls back if page metadata is completely empty/null', () => {
+  render(<HeroSection metadata={null} />);
+  // Verifikasi fallback "Nama Saya" exists to prove graceful degradation
+  expect(screen.getByText(/Nama Saya/i)).toBeDefined();
 });
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
-Run: `npx vitest run tests/frontend/homepage.test.tsx`
-Expected: FAIL.
 
-- [ ] **Step 3: Implementasi fetcher di Halaman Publik**
-Di `app/admin/dashboard/page.tsx`, tambahkan pemanggilan `getAllPages()` dan masukkan ke `initialPages` milik `DashboardClient`.
-Di `app/page.tsx`, panggil `const page = await getPageBySlug('beranda')`. Gunakan `page?.metadata?.hero_name || "Nama Anda"`, `page?.metadata?.hero_description || "..."`, dst. untuk merender UI. Lakukan hal yang sama untuk `app/tentang/page.tsx`.
+Run: `npx vitest tests/frontend/homepage.test.tsx`
+Expected: FAIL, error null reference.
+
+- [ ] **Step 3: Implement Graceful Hydration in Views**
+
+Modify `server/db/queries.ts`: Tambah atau lengkapi ekspor async function `getPageBySlug(slug: string)` dan sesuaikan return fields.
+Modify `app/page.tsx`, `app/tentang/page.tsx`: Fetch SSR di layout/page. Arahkan data ke props children component.
+Modify `components/ui/HeroSection.tsx` & `components/ui/Footer.tsx`: Aplikasikan pola logical OR (`|| "Default value"`) di seluruh variabel yang bersumber dari props Supabase untuk menjamin 0 downtime error saat field admin tak sengaja dikosongkan.
 
 - [ ] **Step 4: Run test to verify it passes**
-Run: `npx vitest run tests/frontend/homepage.test.tsx`
+
+Run: `npx vitest tests/frontend/homepage.test.tsx`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
+
 ```bash
-git add app/page.tsx app/tentang/page.tsx app/admin/dashboard/page.tsx tests/frontend/homepage.test.tsx
-git commit -m "feat: hydrate public pages with dynamic cms data"
+git add server/db/queries.ts app/ components/ui/ tests/frontend/homepage.test.tsx
+git commit -m "feat(public): inject dynamic CMS payload with bulletproof fallback states"
 ```
