@@ -1,37 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Obsidian & Atmosphere — The Tech Dossier 🖋️
 
-## Getting Started
+> **Editorial Precision & Warm Atmosphere**  
+> A personal portfolio and tech dossier for an AI Orchestrator & Agentic AI Engineer.
 
-First, run the development server:
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript)](https://www.typescriptlang.org/)
+
+## 📖 Overview
+
+Most modern tech portfolios fall into two extremes: generic "neon sci-fi" templates lacking technical proof, or static sites that require code redeployment just to update a project. 
+
+**Obsidian & Atmosphere** solves both. It replaces the generic AI aesthetic with a warm, editorial paper-tone design (`#f4f0e8`), weighted serif typography, and terracotta accents (`#bd4b2a`). Beyond its public face, it features a fully integrated **Dossier Control** — a secure, terminal-styled CMS powered by Supabase.
+
+### ✨ Key Features
+
+- 🎭 **Anti-Slop Editorial Design**: Asymmetric curation, high-contrast credential track records, and a warm paper aesthetic that stands out from the generic dark-mode crowd.
+- 🔐 **Terminal-Based Admin Gateway**: Secure `/admin` route featuring a minimalist terminal console authentication (with a mobile-friendly "Cyber Macro Bar").
+- 🗄️ **Dossier Control (CMS)**: Real-time CRUD management for projects and credentials, completely untethered from static deployments.
+- 🧾 **Verifiable Credentials**: High-contrast modal pop-ups displaying hard proof of credentials, certificates, and field documentation.
+- ⚡ **Performance & Accessibility**: Fluid typography, focus & scroll-locking modals, and highly optimized Next.js server actions.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Database & Backend**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **Language**: TypeScript
+- **Testing**: Vitest
+
+## 🚀 Getting Started
+
+First, ensure you have set up your `.env.local` based on the `.env.local.example` file. You will need your Supabase URL, Anon Key, and Admin Password.
 
 ```bash
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📂 Project Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All architectural and design specifications are cleanly documented in the `docs/` directory:
+- `docs/ARCHITECTURE.md`: Core system architecture and data flow.
+- `docs/PRD.md`: Product Requirement Document and goals.
+- `docs/DESIGN.md`: Visual design language, tokens, and UI components.
+- `docs/BACKEND_SETUP.md`: Supabase schema and RLS configurations.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# portofolio
+---
+*Designed and engineered with precision.*
