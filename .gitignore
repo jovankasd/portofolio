@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ai and agents
+/graphify-out/
+/.superpowers/
+
+# secret fallback
+.env
