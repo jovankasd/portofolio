@@ -141,11 +141,16 @@ export function validateUploadFile(file: File): { valid: boolean; error?: string
   if (file.size > MAX_FILE_SIZE) {
     return { valid: false, error: "Ukuran gambar terlalu besar (maksimal 8MB)." };
   }
+  
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return {
-      valid: false,
-      error: `Format file tidak didukung. Gunakan: ${ALLOWED_IMAGE_TYPES.map((t) => t.split("/")[1]).join(", ")}.`,
-    };
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const isValidExt = ["jpg", "jpeg", "png", "webp", "gif", "svg"].includes(ext);
+    if (!isValidExt) {
+      return {
+        valid: false,
+        error: `Format file tidak didukung. Gunakan: ${ALLOWED_IMAGE_TYPES.map((t) => t.split("/")[1]).join(", ")}.`,
+      };
+    }
   }
   return { valid: true };
 }
@@ -211,8 +216,17 @@ export function validateAssetFile(
   if (file.size > MAX_ASSET_SIZE) {
     return { valid: false, error: "Ukuran file terlalu besar (maksimal 5MB)." };
   }
-  const format = rule.mimes[file.type];
-  if (!format || !rule.extension.test(file.name)) return { valid: false, error: rule.error };
+  
+  if (!rule.extension.test(file.name)) return { valid: false, error: rule.error };
+
+  let format = rule.mimes[file.type];
+  if (!format) {
+    if (kind === "cv") format = "pdf";
+    else if (/\.png$/i.test(file.name)) format = "png";
+    else if (/\.webp$/i.test(file.name)) format = "webp";
+    else format = "jpg";
+  }
+
   return { valid: true, format };
 }
 
