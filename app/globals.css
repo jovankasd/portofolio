@@ -1,27 +1,25 @@
+@import "../styles/tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: #f4f0e8; }
+  body {
+    margin: 0;
+    background: #f4f0e8;
+    color: #1d1b18;
+    font-family: var(--font-inter), Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  ::selection { background: #bd4b2a; color: #f8f3e9; }
+  :focus-visible { outline: 2px solid #bd4b2a; outline-offset: 4px; }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  .font-display { font-family: Georgia, "Times New Roman", serif; }
+  .font-mono { font-family: var(--font-jetbrains-mono), monospace; }
 }
