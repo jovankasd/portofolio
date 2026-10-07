@@ -2,7 +2,7 @@ import Image from "next/image";
 import { ArrowDown, Download } from "lucide-react";
 import { DOSSIER_PROFILE } from "@/shared/constants/profile";
 
-export default function HeroSection({ metadata, cvFilename }: { metadata?: any, cvFilename: string }) {
+export default function HeroSection({ metadata, cvUrl }: { metadata?: any, cvUrl: string }) {
   const name = metadata?.hero_name || "Jovanka Surya Dilla";
   const eyebrow = metadata?.hero_eyebrow || "Personal portfolio · AI systems";
   const rolePrimary = metadata?.hero_role_primary || "AI Orchestrator";
@@ -15,6 +15,8 @@ export default function HeroSection({ metadata, cvFilename }: { metadata?: any, 
 
   const [firstName, ...restName] = name.split(" ");
   const lastName = restName.join(" ");
+  
+  const finalCvUrl = cvUrl.startsWith("http") ? cvUrl : `/${cvUrl}`;
 
   return (
     <section id="beranda" className="home-hero relative flex min-h-svh items-center overflow-hidden px-5 pb-14 pt-28 sm:px-8 sm:pb-16 sm:pt-32 lg:px-12">
@@ -40,7 +42,7 @@ export default function HeroSection({ metadata, cvFilename }: { metadata?: any, 
               <a href="#karya" className="inline-flex min-h-12 items-center gap-2 rounded-md bg-[#1D1B18] px-5 text-sm font-medium text-[#F4F0E8] transition-colors hover:bg-[#BD4B2A]">
                 {ctaText} <ArrowDown size={16} aria-hidden="true" />
               </a>
-              <a href={`/${cvFilename}`} download className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#4D463D] transition-colors hover:text-[#BD4B2A]">
+              <a href={finalCvUrl} download className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#4D463D] transition-colors hover:text-[#BD4B2A]" target="_blank" rel="noopener noreferrer">
                 <Download size={16} aria-hidden="true" /> {cvButtonText}
               </a>
             </div>

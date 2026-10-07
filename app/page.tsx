@@ -45,7 +45,7 @@ export default async function HomePage() {
     <main id="top" className="min-h-dvh bg-[#F4F0E8] text-[#1D1B18]">
       <Navbar />
 
-      <HeroSection metadata={berandaPage?.metadata} cvFilename={DOSSIER_PROFILE.cv_filename} />
+      <HeroSection metadata={berandaPage?.metadata} cvUrl={siteSettings?.cv_url || DOSSIER_PROFILE.cv_filename} />
 
       <AboutSection 
         skills={skills} 
