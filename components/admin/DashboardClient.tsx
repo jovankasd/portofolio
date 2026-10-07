@@ -70,10 +70,10 @@ export default function DashboardClient({ initialPages, initialProjects, initial
       thumbnail_url: (formData.get("thumbnail_url") as string) || null,
       live_url: (formData.get("live_url") as string) || null,
       github_url: (formData.get("github_url") as string) || null,
-      ai_tags: (formData.get("ai_tags") as string).split(",").map((t) => t.trim()).filter(Boolean),
-      tech_stack: (formData.get("tech_stack") as string).split(",").map((t) => t.trim()).filter(Boolean),
+      ai_tags: ((formData.get("ai_tags") as string) || "").split(",").map((t) => t.trim()).filter(Boolean),
+      tech_stack: ((formData.get("tech_stack") as string) || "").split(",").map((t) => t.trim()).filter(Boolean),
       sort_order: parseInt(formData.get("sort_order") as string) || 99,
-      is_featured: formData.get("is_featured") === "true",
+      is_featured: formData.get("is_featured") === "true" || formData.get("is_featured") === "on",
     };
 
     startTransition(async () => {
@@ -159,8 +159,8 @@ export default function DashboardClient({ initialPages, initialProjects, initial
       hero_tagline: (formData.get("hero_tagline") as string) || null,
       footer_text: (formData.get("footer_text") as string) || null,
       cv_url: (formData.get("cv_url") as string) || null,
-      skills: (formData.get("skills") as string).split(",").map((s) => s.trim()).filter(Boolean),
-      tools: (formData.get("tools") as string).split(",").map((s) => s.trim()).filter(Boolean),
+      skills: ((formData.get("skills") as string) || "").split(",").map((s) => s.trim()).filter(Boolean),
+      tools: ((formData.get("tools") as string) || "").split(",").map((s) => s.trim()).filter(Boolean),
       principles: parsedPrinciples,
     };
 

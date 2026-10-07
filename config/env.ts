@@ -18,7 +18,16 @@ export const env = {
     hasServiceRole: () => !!process.env.SUPABASE_SERVICE_ROLE_KEY,
   },
   admin: {
-    masterKeyHash: () => optional("ADMIN_MASTER_KEY_HASH"),
+    masterKeyHash: () => {
+      const raw = optional("ADMIN_MASTER_KEY_HASH");
+      if (!raw) return "";
+      // Hash disimpan base64 untuk menghindari issue karakter $ pada dotenv parser
+      try {
+        return Buffer.from(raw, "base64").toString("utf-8");
+      } catch {
+        return raw; // fallback jika tidak base64
+      }
+    },
     sessionSecret: () => required("ADMIN_SESSION_SECRET"),
     hasMasterKeyHash: () => !!process.env.ADMIN_MASTER_KEY_HASH,
   },

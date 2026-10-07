@@ -1,7 +1,7 @@
 import type { DossierProfile } from "@/shared/types";
 
 export const DOSSIER_PROFILE: DossierProfile = {
-  codename: "Obsidian & Atmosphere",
+  codename: "Jovanka Surya Dilla",
   persona: "AI Orchestrator & Agentic AI Engineer",
   status: "ONLINE",
   location: "UTC+7",

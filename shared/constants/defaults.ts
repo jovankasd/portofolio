@@ -5,11 +5,11 @@ export const INITIAL_PROJECTS: ProjectItem[] = [
     id: "proj-01",
     title: "Autonomous Agent Orchestrator",
     summary: "Multi-agent runtime framework for asynchronous task decomposition, tool dispatch, and verification loops.",
-    description: "Designed a deterministic orchestration engine capable of directing specialized subagents across isolated sandboxes. Features dynamic context compaction and structured JSON validation.",
+    description: "Designed a deterministic orchestration engine capable of directing specialized subagents across isolated sandboxes. Features dynamic context compaction and structured JSON validation. Diperkuat dengan implementasi Model Context Protocol (MCP) untuk ekstensi tools secara dinamis.",
     thumbnail_url: "/projects/agent-orchestrator.svg",
     live_url: "https://demo.ai-orchestrator.internal",
     github_url: "https://github.com/example/autonomous-orchestrator",
-    ai_tags: ["Multi-Agent Architecture", "Tool Calling", "Autonomous Loops"],
+    ai_tags: ["Multi-Agent Architecture", "Tool Calling", "Autonomous Loops", "MCP Integration"],
     tech_stack: ["TypeScript", "Next.js", "Python", "LangGraph", "FastAPI"],
     sort_order: 1,
     is_featured: true,
@@ -39,6 +39,31 @@ export const INITIAL_PROJECTS: ProjectItem[] = [
     sort_order: 3,
     is_featured: false,
   },
+];
+
+export const INITIAL_SKILLS = ["React.js", "Tailwind CSS", "Python", "Flask", "SQLite", "MySQL"];
+export const INITIAL_TOOLS = ["Google Antigravity", "VS Code", "Google AI Studio", "MCP", "Supabase"];
+export const INITIAL_PRINCIPLES = [
+  {
+    number: "01",
+    title: "AI yang punya batas",
+    description: "Agen bekerja dalam ruang yang jelas, dengan aturan yang bisa dipahami.",
+  },
+  {
+    number: "02",
+    title: "Mudah digunakan",
+    description: "Teknologi rumit tetap harus terasa sederhana bagi orang yang memakainya.",
+  },
+  {
+    number: "03",
+    title: "Siap diandalkan",
+    description: "Hasil penting perlu bisa diuji, ditelusuri, dan diperbaiki.",
+  },
+  {
+    number: "04",
+    title: "Extensible by Design",
+    description: "Membangun jembatan konteks menggunakan Model Context Protocol (MCP) agar AI Agent dapat berkembang secara modular dan terarah.",
+  }
 ];
 
 export const INITIAL_CREDENTIALS: CredentialItem[] = [

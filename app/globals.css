@@ -6,20 +6,207 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; background: #f4f0e8; }
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-page);
+    color: var(--color-ink);
+  }
   body {
     margin: 0;
-    background: #f4f0e8;
-    color: #1d1b18;
+    background: var(--color-page);
+    color: var(--color-ink);
     font-family: var(--font-inter), Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  ::selection { background: #bd4b2a; color: #f8f3e9; }
-  :focus-visible { outline: 2px solid #bd4b2a; outline-offset: 4px; }
+  ::selection {
+    color: var(--color-ink);
+    background: var(--color-accent-soft);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
 }
 
 @layer utilities {
   .font-display { font-family: Georgia, "Times New Roman", serif; }
   .font-mono { font-family: var(--font-jetbrains-mono), monospace; }
+}
+
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-ready {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition: opacity 180ms ease-out var(--reveal-delay, 0ms),
+    transform 180ms ease-out var(--reveal-delay, 0ms);
+}
+
+.reveal-ready.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-rule {
+  background: rgba(29, 27, 24, 0.1);
+}
+
+.route-transition {
+  animation: route-fade-in 200ms ease-out both;
+}
+
+.home-name {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: clamp(3.75rem, 11.4vw, 9.5rem);
+  letter-spacing: -0.085em;
+}
+
+.home-name-second {
+  font-size: 0.77em;
+  letter-spacing: -0.075em;
+}
+
+.home-portrait {
+  isolation: isolate;
+  animation: route-enter 200ms ease-out 50ms both;
+}
+
+.home-portrait-field {
+  transform: translateY(12px);
+}
+
+.home-scroll-cue {
+  transition: color 180ms ease-out;
+}
+
+.home-scroll-mark {
+  width: 1px;
+  height: 23px;
+  background: currentColor;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+.nav-link-current {
+  color: var(--color-ink);
+}
+
+.nav-link-current::after {
+  position: absolute;
+  right: 0;
+  bottom: 9px;
+  left: 0;
+  height: 1px;
+  background: var(--color-accent);
+  content: "";
+}
+
+section[id] {
+  scroll-margin-top: 84px;
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes route-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.hero-emphasis {
+  color: var(--color-accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.portrait-stage {
+  isolation: isolate;
+  transition: transform 180ms ease-out;
+}
+
+.portrait-subject {
+  transform: translate3d(calc(var(--portrait-x, 0px) * -0.35), calc(var(--portrait-y, 0px) * -0.35), 0);
+  transition: transform 180ms ease-out;
+}
+
+.portrait-paper {
+  transform: translate3d(calc(var(--portrait-x, 0px) * 0.5), calc(var(--portrait-y, 0px) * 0.5), 0);
+  transition: transform 180ms ease-out;
+}
+
+.portrait-orbit {
+  transform: translate3d(calc(var(--portrait-x, 0px) * 0.8), calc(var(--portrait-y, 0px) * 0.8), 0);
+  transition: transform 180ms ease-out;
+}
+
+.portrait-caption {
+  box-shadow: 0 8px 24px rgba(29, 27, 24, 0.06);
+}
+
+.project-visual {
+  transform: perspective(1000px) rotateY(-2deg) rotateX(1deg);
+  transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+  box-shadow: 0 18px 42px rgba(29, 27, 24, 0.08);
+}
+
+.project-visual:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-4px);
+  box-shadow: 0 26px 52px rgba(29, 27, 24, 0.13);
+}
+
+.scroll-progress {
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  transition: transform 100ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-ready,
+  .reveal-ready.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .portrait-stage,
+  .portrait-subject,
+  .portrait-paper,
+  .portrait-orbit,
+  .project-visual,
+  .project-visual:hover {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .route-transition,
+  .home-portrait {
+    animation: none !important;
+  }
 }

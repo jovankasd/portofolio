@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import type { AdminSession } from "@/server/auth/session";
 
-const PROTECTED_PATHS = ["/dossier-control/dashboard"];
+const PROTECTED_PATHS = ["/admin/dashboard", "/dossier-control/dashboard"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// Rewrite ke 404 — URL di address bar TETAP /dossier-control/dashboard,
+// Rewrite ke 404 — URL di address bar tetap berada di rute yang diminta,
 // status HTTP 404, tidak ada redirect yang membocorkan keberadaan rute.
 function rewriteTo404(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -50,5 +50,5 @@ function rewriteTo404(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dossier-control/dashboard/:path*"],
+  matcher: ["/admin/dashboard/:path*", "/dossier-control/dashboard/:path*"],
 };

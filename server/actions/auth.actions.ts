@@ -79,7 +79,7 @@ export async function authenticateAdmin(key: string): Promise<AuthResult> {
 
 export async function logoutAdmin(): Promise<void> {
   await destroyAdminSession();
-  revalidatePath("/dossier-control");
+  revalidatePath("/admin");
 }
 
 export { verifyAdminSession };

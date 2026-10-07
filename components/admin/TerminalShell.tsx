@@ -65,7 +65,7 @@ export default function TerminalShell() {
           "REDIRECTING TO ARCHIVE CONTROLLER...",
         ]);
         setAuthenticated(true);
-        setTimeout(() => router.push("/dossier-control/dashboard"), 1200);
+        setTimeout(() => router.push("/admin/dashboard"), 1200);
       } else if (result.error === "TOO_MANY_ATTEMPTS" && result.lockoutUntil) {
         const secsLeft = Math.ceil((result.lockoutUntil - Date.now()) / 1000);
         setLockoutSeconds(secsLeft);

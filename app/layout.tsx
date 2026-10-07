@@ -15,12 +15,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Obsidian & Atmosphere | Portfolio",
+  title: "Jovanka Surya Dilla — AI Orchestrator",
   description:
-    "Portfolio karya sistem AI, knowledge infrastructure, dan product engineering.",
+    "Portofolio Jovanka Surya Dilla, AI Orchestrator dan Agentic Systems Engineer.",
   openGraph: {
-    title: "Obsidian & Atmosphere | Portfolio",
-    description: "Karya dan catatan dari seorang AI engineer.",
+    title: "Jovanka Surya Dilla — AI Orchestrator",
+    description: "Portofolio rekayasa sistem AI dan orkestrasi agen otonom oleh Jovanka Surya Dilla.",
     type: "website",
   },
 };
