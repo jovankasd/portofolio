@@ -26,42 +26,42 @@ export default function CredentialModal({ credential, onClose }: { credential: C
 
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="credential-modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <button type="button" onClick={onClose} className="absolute inset-0 bg-[#1D1B18]/65 backdrop-blur-sm" aria-label="Tutup jendela bukti" />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-[#1D1B18]/10 bg-[#F4F0E8] p-5 text-[#1D1B18] shadow-2xl sm:p-7">
-        <div className="flex items-start justify-between gap-5 border-b border-[#1D1B18]/10 pb-5">
+      <button type="button" onClick={onClose} className="absolute inset-0 bg-[#111215]/40 backdrop-blur-sm" aria-label="Tutup jendela bukti" />
+      <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[1rem] border border-outline-variant bg-surface p-5 text-on-surface shadow-2xl sm:p-7">
+        <div className="flex items-start justify-between gap-5 border-b border-outline-variant pb-5">
           <div>
-            <p className="text-sm text-[#625C54]">{credential.issuer} · {credential.issue_date}</p>
-            <h2 id="credential-modal-title" className="mt-2 text-2xl font-medium tracking-tight">{credential.title}</h2>
+            <p className="font-label-nav text-[14px] text-on-surface-variant">{credential.issuer} · {credential.issue_date}</p>
+            <h2 id="credential-modal-title" className="mt-2 font-headline-sm text-[18px] font-semibold leading-[24px]">{credential.title}</h2>
           </div>
-          <button type="button" onClick={onClose} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-[#1D1B18]/10 text-[#625C54] hover:bg-[#E9E2D6] hover:text-[#1D1B18]" aria-label="Tutup">
-            <X size={19} aria-hidden="true" />
+          <button type="button" onClick={onClose} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-outline-variant text-on-surface-variant hover:border-outline hover:text-on-surface transition-colors" aria-label="Tutup">
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
         {credential.proof_image_url && (
-          <div className="my-4 flex gap-2" role="tablist" aria-label="Jenis dokumen">
-            <button type="button" role="tab" aria-selected={activeTab === "cert"} onClick={() => setActiveTab("cert")} className={`inline-flex min-h-10 items-center gap-2 rounded-md px-3 text-sm ${activeTab === "cert" ? "bg-[#1D1B18] text-[#F4F0E8]" : "border border-[#1D1B18]/10 text-[#625C54] hover:bg-[#E9E2D6]"}`}><Award size={15} /> Sertifikat</button>
-            <button type="button" role="tab" aria-selected={activeTab === "proof"} onClick={() => setActiveTab("proof")} className={`inline-flex min-h-10 items-center gap-2 rounded-md px-3 text-sm ${activeTab === "proof" ? "bg-[#1D1B18] text-[#F4F0E8]" : "border border-[#1D1B18]/10 text-[#625C54] hover:bg-[#E9E2D6]"}`}><ImageIcon size={15} /> Dokumentasi</button>
+          <div className="my-5 flex gap-2" role="tablist" aria-label="Jenis dokumen">
+            <button type="button" role="tab" aria-selected={activeTab === "cert"} onClick={() => setActiveTab("cert")} className={`inline-flex h-[40px] items-center gap-2 rounded-full px-4 font-label-nav text-[14px] font-medium transition-colors ${activeTab === "cert" ? "bg-primary text-on-primary" : "border border-outline-variant text-on-surface-variant hover:border-outline hover:text-on-surface"}`}><Award size={16} /> Sertifikat</button>
+            <button type="button" role="tab" aria-selected={activeTab === "proof"} onClick={() => setActiveTab("proof")} className={`inline-flex h-[40px] items-center gap-2 rounded-full px-4 font-label-nav text-[14px] font-medium transition-colors ${activeTab === "proof" ? "bg-primary text-on-primary" : "border border-outline-variant text-on-surface-variant hover:border-outline hover:text-on-surface"}`}><ImageIcon size={16} /> Dokumentasi</button>
           </div>
         )}
 
-        <div className="relative my-5 h-72 w-full overflow-hidden rounded-lg bg-[#E9E2D6] sm:h-80">
+        <div className="relative my-5 h-72 w-full overflow-hidden rounded-[0.5rem] bg-surface-container sm:h-80 border border-outline-variant">
           {imageUrl ? (
-            <Image src={imageUrl} alt={`Bukti ${credential.title}`} fill className="object-cover p-4" sizes="(max-width: 768px) 100vw, 640px" />
+            <Image src={imageUrl} alt={`Bukti ${credential.title}`} fill className="object-cover" sizes="(max-width: 768px) 100vw, 640px" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[#1D1B18]/5 text-[#81776A]">
-              <span className="text-sm">Dokumen fisik</span>
+            <div className="flex h-full w-full items-center justify-center bg-surface-variant text-on-surface-variant">
+              <span className="font-label-nav text-[14px]">Dokumen fisik</span>
             </div>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#1D1B18]/10 pt-4">
-          <span className="text-sm text-[#625C54]">{credential.category === "competition" ? "Pencapaian" : "Sertifikasi"}</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant pt-5">
+          <span className="font-label-nav text-[14px] font-medium text-on-surface-variant">{credential.category === "competition" ? "Pencapaian" : "Sertifikasi"}</span>
           {credential.verification_url ? (
-            <a href={credential.verification_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#1D1B18] px-4 text-sm font-medium text-[#F4F0E8] hover:bg-[#BD4B2A]">
-              <ExternalLink size={15} aria-hidden="true" /> Buka tautan verifikasi
+            <a href={credential.verification_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-[40px] items-center gap-2 rounded-pill bg-primary px-[20px] font-label-nav text-[14px] font-medium text-on-primary hover:bg-[#262930] transition-colors">
+              <ExternalLink size={16} aria-hidden="true" /> Buka tautan verifikasi
             </a>
-          ) : <span className="text-sm text-[#625C54]">Dokumen pribadi</span>}
+          ) : <span className="font-label-nav text-[14px] font-medium text-on-surface-variant">Dokumen pribadi</span>}
         </div>
       </div>
     </div>
