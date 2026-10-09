@@ -1,34 +1,37 @@
 :root {
-  /* Warm archive palette shared with the admin experience. */
-  --color-page: #f4f0e8;
-  --color-surface: #e9e2d6;
-  --color-surface-raised: #fcfbf9;
-  --color-ink: #1d1b18;
-  --color-muted: #625c54;
-  --color-accent: #bd4b2a;
-  --color-accent-soft: #eed8cc;
-  --color-dark: #1d1b18;
-  --color-dark-text: #f4f0e8;
-  --color-border: rgba(29, 27, 24, 0.14);
-  --color-border-dark: rgba(244, 240, 232, 0.16);
-
-  --bg-base: var(--color-page);
-  --bg-elevated: var(--color-surface);
-  --bg-contrast: var(--color-dark);
-  --ink-primary: var(--color-ink);
-  --ink-secondary: var(--color-muted);
-  --ink-muted: rgba(29, 27, 24, 0.52);
-  --ink-contrast: var(--color-dark-text);
-  --accent-primary: var(--color-accent);
-  --accent-warm: var(--color-accent);
-  --accent-light: var(--color-surface-raised);
-  --border-subtle: var(--color-border);
-  --border-strong: rgba(29, 27, 24, 0.24);
-  --border-contrast: var(--color-border-dark);
-
-  --radius-card: 8px;
-  --radius-btn: 6px;
-  --radius-modal: 10px;
-  --motion-fast: 160ms ease-out;
-  --motion-base: 240ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  --color-surface: #f9f9fa;
+  --color-surface-dim: #dadadb;
+  --color-surface-bright: #f9f9fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f3f4;
+  --color-surface-container: #eeeeef;
+  --color-surface-container-high: #e8e8e9;
+  --color-surface-container-highest: #e2e2e3;
+  
+  --color-on-surface: #1a1c1d;
+  --color-on-surface-variant: #46464b;
+  
+  --color-primary: #111215;
+  --color-on-primary: #ffffff;
+  
+  --color-outline: #76777b;
+  --color-outline-variant: #e4e6eb;
+  
+  --color-tertiary-fixed-dim: #22c55e;
+  
+  /* Retained for backward compatibility temporarily */
+  --color-page: #f9f9fa;
+  --color-ink: #111215;
+  --color-accent: #111215;
+  --color-dark: #111215;
+  --color-dark-text: #ffffff;
+  --color-border: rgba(17, 18, 21, 0.14);
+  --bg-base: var(--color-surface);
+  --bg-elevated: var(--color-surface-container-lowest);
+  
+  --radius-card: 16px;
+  --radius-btn: 9999px;
+  --radius-modal: 16px;
+  --motion-fast: 150ms ease-out;
+  --motion-base: 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }

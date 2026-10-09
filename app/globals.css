@@ -8,23 +8,23 @@
   * { box-sizing: border-box; }
   html {
     scroll-behavior: smooth;
-    background: var(--color-page);
-    color: var(--color-ink);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
   }
   body {
     margin: 0;
-    background: var(--color-page);
-    color: var(--color-ink);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
     font-family: var(--font-inter), Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
   ::selection {
-    color: var(--color-ink);
-    background: var(--color-accent-soft);
+    color: var(--color-on-primary);
+    background: var(--color-primary);
   }
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-primary);
     outline-offset: 3px;
   }
 }
@@ -208,5 +208,36 @@ section[id] {
   .route-transition,
   .home-portrait {
     animation: none !important;
+  }
+}
+
+/* Executive Minimalist Animations */
+.anim-hero-text {
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.smooth-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

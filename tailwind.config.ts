@@ -9,6 +9,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        surface: {
+          DEFAULT: "var(--color-surface)",
+          dim: "var(--color-surface-dim)",
+          bright: "var(--color-surface-bright)",
+          container: {
+            lowest: "var(--color-surface-container-lowest)",
+            low: "var(--color-surface-container-low)",
+            DEFAULT: "var(--color-surface-container)",
+            high: "var(--color-surface-container-high)",
+            highest: "var(--color-surface-container-highest)",
+          }
+        },
+        "on-surface": {
+          DEFAULT: "var(--color-on-surface)",
+          variant: "var(--color-on-surface-variant)",
+        },
+        primary: {
+          DEFAULT: "var(--color-primary)",
+        },
+        "on-primary": {
+          DEFAULT: "var(--color-on-primary)",
+        },
+        outline: {
+          DEFAULT: "var(--color-outline)",
+          variant: "var(--color-outline-variant)",
+        },
+        tertiary: {
+          "fixed-dim": "var(--color-tertiary-fixed-dim)",
+        },
+        
+        // Retained for backward compatibility temporarily
         archive: {
           paper: "#F5F1E8",
           weathered: "#E8E1D3",
@@ -59,15 +90,26 @@ const config: Config = {
         },
       },
       fontFamily: {
+        "display-hero": ["var(--font-space-grotesk)", "sans-serif"],
+        "headline-xl": ["var(--font-space-grotesk)", "sans-serif"],
+        "headline-lg": ["var(--font-space-grotesk)", "sans-serif"],
+        "headline-md": ["var(--font-space-grotesk)", "sans-serif"],
+        "headline-sm": ["var(--font-space-grotesk)", "sans-serif"],
+        "body-lg": ["var(--font-inter)", "sans-serif"],
+        "body-md": ["var(--font-inter)", "sans-serif"],
+        "body-sm": ["var(--font-inter)", "sans-serif"],
+        "label-uppercase": ["var(--font-space-grotesk)", "sans-serif"],
+        "label-nav": ["var(--font-inter)", "sans-serif"],
         display: ["Georgia", "Times New Roman", "serif"],
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
       },
       borderRadius: {
-        card: "6px",
-        btn: "4px",
-        input: "4px",
-        modal: "8px",
+        card: "16px",
+        btn: "9999px",
+        pill: "9999px",
+        input: "12px",
+        modal: "16px",
       },
       transitionTimingFunction: {
         editorial: "cubic-bezier(0.16, 1, 0.3, 1)",
