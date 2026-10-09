@@ -92,11 +92,11 @@ export default async function HomePage() {
         socials={socialsData}
       />
 
-      <footer className="border-t border-[#1D1B18]/10 px-5 py-7 text-sm text-[#625C54] sm:px-8 lg:px-12">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-medium text-[#1D1B18]">{DOSSIER_PROFILE.codename}</span>
+      <footer className="border-t border-outline-variant bg-background px-5 py-8 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-label-uppercase text-[12px] font-semibold leading-[16px] tracking-[0.08em] uppercase text-on-surface">{DOSSIER_PROFILE.codename}</span>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <span>{footerText}</span>
+            <span className="font-body-sm text-[13px] leading-[20px] text-on-surface-variant">{footerText}</span>
           </div>
         </div>
       </footer>
