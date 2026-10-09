@@ -45,7 +45,7 @@ export default async function HomePage() {
     : DOSSIER_PROFILE.socials;
 
   return (
-    <main id="top" className="min-h-dvh bg-[#F4F0E8] text-[#1D1B18]">
+    <main id="top" className="min-h-dvh bg-background text-on-surface">
       <Navbar />
 
       <HeroSection metadata={berandaPage?.metadata} cvUrl={(berandaPage?.metadata?.cv_url as string | undefined) || DOSSIER_PROFILE.cv_filename} />
@@ -60,18 +60,20 @@ export default async function HomePage() {
 
       <section id="karya" className="flex min-h-svh items-center px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
         <div className="mx-auto w-full max-w-6xl">
-          <Reveal className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-medium text-[#BD4B2A]">Pilihan karya</p>
-              <h2 className="mt-3 text-balance text-3xl font-medium tracking-[-0.04em] sm:text-4xl">Beberapa hal yang saya bangun.</h2>
+          <Reveal className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div className="max-w-2xl">
+              <p className="mb-3 font-label-uppercase text-[12px] font-semibold leading-[16px] tracking-[0.08em] uppercase text-on-surface-variant">Pilihan karya</p>
+              <h2 className="text-balance font-headline-lg text-[36px] font-semibold leading-[42px] tracking-[-0.02em] text-on-surface sm:text-[56px] sm:leading-[60px] sm:tracking-[-0.03em]">Beberapa hal yang saya bangun.</h2>
             </div>
-            <p className="max-w-md text-pretty text-sm leading-6 text-[#625C54]">Proyek tentang cara membuat sistem AI lebih berguna, terarah, dan dapat diandalkan.</p>
+            <p className="max-w-md text-pretty font-body-md text-[15px] leading-[24px] tracking-[-0.005em] text-on-surface-variant">Proyek tentang cara membuat sistem AI lebih berguna, terarah, dan dapat diandalkan.</p>
           </Reveal>
-          <div className="divide-y divide-[#1D1B18]/10 border-y border-[#1D1B18]/10">
+          
+          <div className="grid gap-6 sm:grid-cols-2 lg:gap-8">
             {projects.map((project, index) => <ProjectCard key={project.id} project={project as unknown as ProjectItem} index={index} />)}
           </div>
-          <Reveal className="mt-8">
-            <Link href="#tentang" className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#4D463D] transition-colors hover:text-[#BD4B2A]">
+          
+          <Reveal className="mt-12 flex justify-center sm:justify-start">
+            <Link href="#tentang" className="inline-flex h-[48px] items-center gap-2 rounded-pill border border-outline-variant px-[28px] font-label-nav text-[14px] font-medium text-on-surface transition-all duration-150 hover:border-outline hover:bg-surface-container-lowest">
               Kenali cara saya bekerja <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           </Reveal>
