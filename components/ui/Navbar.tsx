@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { DOSSIER_PROFILE } from "@/shared/constants/profile";
@@ -69,10 +69,10 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${isScrolled ? "border-b border-[#1D1B18]/[0.07] bg-[#F4F0E8]/90 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
-      <div className="scroll-progress absolute inset-x-0 top-0 h-0.5 bg-[#BD4B2A]" style={{ "--scroll-progress": progress } as CSSProperties} />
+    <header className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${isScrolled ? "border-b border-outline-variant bg-surface/85 backdrop-blur-[12px] shadow-sm" : "bg-transparent"}`}>
+      <div className="scroll-progress absolute inset-x-0 top-0 h-[2px] bg-primary origin-left" style={{ transform: `scaleX(${progress})` }} />
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="#beranda" className="text-sm font-semibold tracking-[-0.02em] text-[#1D1B18]">
+        <Link href="#beranda" className="font-label-uppercase text-[12px] font-semibold leading-[16px] tracking-[0.08em] text-on-surface uppercase">
           {DOSSIER_PROFILE.codename}
         </Link>
 
@@ -82,21 +82,21 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               aria-current={activeSection === link.section ? "location" : undefined}
-              className={`nav-link text-sm transition-colors hover:text-[#1D1B18] ${activeSection === link.section ? "nav-link-current" : "text-[#625C54]"}`}
+              className={`font-label-nav text-[14px] font-medium leading-[18px] tracking-[-0.01em] transition-all hover:underline hover:text-on-surface underline-offset-4 ${activeSection === link.section ? "text-on-surface underline decoration-outline-variant" : "text-on-surface-variant decoration-transparent"}`}
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <Link href="#kontak" aria-current={activeSection === "kontak" ? "location" : undefined} className={`hidden min-h-10 items-center rounded-md border px-4 text-sm font-medium transition-colors hover:border-[#BD4B2A] hover:bg-[#E9E2D6] md:inline-flex ${activeSection === "kontak" ? "border-[#BD4B2A] bg-[#E9E2D6] text-[#1D1B18]" : "border-[#1D1B18]/15 text-[#4D463D]"}`}>
+        <Link href="#kontak" aria-current={activeSection === "kontak" ? "location" : undefined} className="hidden h-[40px] items-center rounded-pill border border-outline-variant px-[24px] font-label-nav text-[14px] font-medium text-on-surface transition-all duration-150 hover:border-outline hover:bg-surface-container-lowest md:inline-flex">
           Hubungi saya
         </Link>
 
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-[#4D463D] hover:bg-[#E9E2D6] md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-pill text-on-surface transition-colors hover:bg-surface-container md:hidden"
           aria-expanded={open}
           aria-label={open ? "Tutup menu" : "Buka menu"}
         >
@@ -105,13 +105,13 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <nav className="border-t border-[#1D1B18]/10 bg-[#F4F0E8] px-5 pb-5 pt-2 md:hidden" aria-label="Navigasi seluler">
+        <nav className="border-t border-outline-variant bg-surface px-5 pb-5 pt-2 md:hidden" aria-label="Navigasi seluler">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={activeSection === link.section ? "location" : undefined} className="flex min-h-12 items-center border-b border-[#1D1B18]/[0.07] text-base text-[#4D463D]">
+            <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={activeSection === link.section ? "location" : undefined} className="flex min-h-12 items-center border-b border-outline-variant/50 font-label-nav text-[14px] font-medium text-on-surface">
               {link.label}
             </Link>
           ))}
-          <Link href="#kontak" onClick={() => setOpen(false)} aria-current={activeSection === "kontak" ? "location" : undefined} className="mt-4 inline-flex min-h-11 items-center rounded-md bg-[#1D1B18] px-4 text-sm font-medium text-[#F4F0E8]">
+          <Link href="#kontak" onClick={() => setOpen(false)} aria-current={activeSection === "kontak" ? "location" : undefined} className="mt-4 inline-flex h-[48px] w-full items-center justify-center rounded-pill bg-primary px-[28px] font-label-nav text-[14px] font-medium text-on-primary transition-colors hover:bg-[#262930]">
             Hubungi saya
           </Link>
         </nav>
